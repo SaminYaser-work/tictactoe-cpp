@@ -172,9 +172,44 @@ int bestMove(char pos[]) {
     return bestPos;
 }
 
+class Utils {
+  private:
+    int field;
+    bool playerTurn;
+    bool isSinglePlayer;
+
+  public:
+    Utils(int field, bool playerTurn, bool isSinglePlayer) {
+        this->field = field;
+        this->playerTurn = playerTurn;
+        this->isSinglePlayer = isSinglePlayer;
+    }
+
+    int promptForInput() {
+
+        if (!isSinglePlayer) {
+            playerTurn ? std::cout << "Player 1 (X), "
+                       : std::cout << "Player 2 (O), ";
+            std::cout << "Select a field (1-9): ";
+        } else {
+
+            std::cout << "Player (X), Select a field (1-9): ";
+        }
+
+        std::cin >> field;
+        std::cout << "\n";
+
+        return field;
+    }
+
+    bool switchTurn() {
+        playerTurn ? playerTurn = false : playerTurn = true;
+        return playerTurn;
+    }
+};
+
 int main() {
     bool playerTurn = true;
-    bool singlePlayer;
     char pos[9];
     int field;
     int turnCount;
@@ -183,18 +218,16 @@ int main() {
         pos[i] = ' ';
     }
 
-    singlePlayer = gameMode();
-
-    if (singlePlayer) {
+    if (gameMode()) {
         drawBoard(pos);
 
         while (1) {
 
             std::cout << std::endl;
 
-            std::cout << "Player (X), Select a field (1-9): ";
-            std::cin >> field;
-            std::cout << "\n";
+            Utils utils(field, playerTurn, true);
+
+            field = utils.promptForInput();
 
             if (field < 1 || field > 9 || pos[field - 1] != ' ') {
                 drawBoard(pos);
@@ -210,7 +243,7 @@ int main() {
                 break;
             }
 
-            playerTurn ? playerTurn = false : playerTurn = true;
+            playerTurn = utils.switchTurn();
 
             turnCount++;
             if (turnCount == 9) {
@@ -232,7 +265,8 @@ int main() {
                 break;
             }
 
-            playerTurn ? playerTurn = false : playerTurn = true;
+            playerTurn = utils.switchTurn();
+            /* playerTurn ? playerTurn = false : playerTurn = true; */
 
             turnCount++;
             if (turnCount == 9) {
@@ -250,11 +284,9 @@ int main() {
 
             std::cout << std::endl;
 
-            playerTurn ? std::cout << "Player 1 (X), "
-                       : std::cout << "Player 2 (O), ";
-            std::cout << "Select a field (1-9): ";
-            std::cin >> field;
-            std::cout << std::endl;
+            Utils utils(field, playerTurn, true);
+
+            field = utils.promptForInput();
 
             if (field < 1 || field > 9 || pos[field - 1] != ' ') {
                 drawBoard(pos);
@@ -279,7 +311,7 @@ int main() {
                     break;
                 }
 
-                playerTurn ? playerTurn = false : playerTurn = true;
+                playerTurn = utils.switchTurn();
             }
         }
     }
