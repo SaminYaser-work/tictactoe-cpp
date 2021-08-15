@@ -172,6 +172,7 @@ int bestMove(char pos[]) {
     return bestPos;
 }
 
+// Text output jobs
 class Utils {
   private:
     int field;
@@ -202,9 +203,47 @@ class Utils {
         return field;
     }
 
+    void drawBoard(char pos[]) {
+        std::cout << '\n';
+        for (int i = 0; i < 9; i = i + 3) {
+            std::cout << pos[i] << "|" << pos[i + 1] << "|" << pos[i + 2]
+                      << std::endl;
+            if (i < 6) {
+                std::cout << "-+-+-" << std::endl;
+            }
+        }
+        std::cout << '\n';
+    }
+};
+
+// Simple logic jobs
+class Logic {
+  private:
+    bool playerTurn;
+
+  public:
+    Logic(bool playerTurn) { this->playerTurn = playerTurn; }
+
+    bool validateField(char pos[], int field) {
+        if (field < 1 || field > 9 || pos[field - 1] != ' ') {
+            std::cout << "INVALID FIELD" << std::endl;
+            return false;
+        }
+        return true;
+    }
+
     bool switchTurn() {
         playerTurn ? playerTurn = false : playerTurn = true;
         return playerTurn;
+    }
+
+    bool isMoveLeft(char pos[]) {
+        for (int i = 0; i < 9; i++) {
+            if (pos[i] == ' ') {
+                return true;
+            }
+        }
+        return false;
     }
 };
 
@@ -212,28 +251,37 @@ int main() {
     bool playerTurn = true;
     char pos[9];
     int field;
-    int turnCount;
+    /* int turnCount; */
 
     for (int i = 0; i < 9; i++) {
         pos[i] = ' ';
     }
 
+    // Singleplayer
     if (gameMode()) {
-        drawBoard(pos);
+
+        Utils utils(field, playerTurn, true);
+        Logic logic(playerTurn);
+
+        /* drawBoard(pos); */
+        utils.drawBoard(pos);
 
         while (1) {
 
             std::cout << std::endl;
 
-            Utils utils(field, playerTurn, true);
-
             field = utils.promptForInput();
 
-            if (field < 1 || field > 9 || pos[field - 1] != ' ') {
-                drawBoard(pos);
-                std::cout << "INVALID FIELD" << std::endl;
+            /* if (field < 1 || field > 9 || pos[field - 1] != ' ') { */
+            /*     drawBoard(pos); */
+            /*     std::cout << "INVALID FIELD" << std::endl; */
+            /*     continue; */
+            /* } */
+            if (!logic.validateField(pos, field)) {
+                utils.drawBoard(pos);
                 continue;
             }
+
             pos[field - 1] = 'X';
 
             if (checkWin(pos, playerTurn)) {
@@ -243,10 +291,10 @@ int main() {
                 break;
             }
 
-            playerTurn = utils.switchTurn();
+            playerTurn = logic.switchTurn();
 
-            turnCount++;
-            if (turnCount == 9) {
+            /* turnCount++; */
+            if (!logic.isMoveLeft(pos)) {
                 std::cout << "It's a draw!" << std::endl;
                 break;
             }
@@ -256,7 +304,8 @@ int main() {
             std::cout << bestMove(pos) << "\n";
             pos[bestMove(pos)] = 'O';
 
-            drawBoard(pos);
+            /* drawBoard(pos); */
+            utils.drawBoard(pos);
 
             if (checkWin(pos, playerTurn)) {
 
@@ -265,11 +314,11 @@ int main() {
                 break;
             }
 
-            playerTurn = utils.switchTurn();
+            playerTurn = logic.switchTurn();
             /* playerTurn ? playerTurn = false : playerTurn = true; */
 
-            turnCount++;
-            if (turnCount == 9) {
+            /* turnCount++; */
+            if (!logic.isMoveLeft(pos)) {
                 std::cout << "It's a draw!" << std::endl;
                 break;
             }
@@ -277,14 +326,15 @@ int main() {
     }
 
     else {
+        Utils utils(field, playerTurn, false);
+        Logic logic(playerTurn);
 
-        drawBoard(pos);
+        /* drawBoard(pos); */
+        utils.drawBoard(pos);
 
         while (1) {
 
             std::cout << std::endl;
-
-            Utils utils(field, playerTurn, true);
 
             field = utils.promptForInput();
 
@@ -296,7 +346,8 @@ int main() {
 
                 playerTurn ? pos[field - 1] = 'X' : pos[field - 1] = 'O';
 
-                drawBoard(pos);
+                /* drawBoard(pos); */
+                utils.drawBoard(pos);
 
                 if (checkWin(pos, playerTurn)) {
 
@@ -305,13 +356,13 @@ int main() {
                     break;
                 }
 
-                turnCount++;
-                if (turnCount == 9) {
+                /* turnCount++; */
+                if (!logic.isMoveLeft(pos)) {
                     std::cout << "It's a draw!" << std::endl;
                     break;
                 }
 
-                playerTurn = utils.switchTurn();
+                playerTurn = logic.switchTurn();
             }
         }
     }
