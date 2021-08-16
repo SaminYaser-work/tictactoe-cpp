@@ -17,20 +17,20 @@ void drawBoard(char pos[]) {
 // 0 1 2
 // 3 4 5
 // 6 7 8
-bool checkWin(char pos[], bool turn) {
-    char symbol;
-    turn ? symbol = 'X' : symbol = 'O';
-    if ((pos[0] == symbol && pos[1] == symbol && pos[2] == symbol) ||
-        (pos[3] == symbol && pos[4] == symbol && pos[5] == symbol) ||
-        (pos[6] == symbol && pos[7] == symbol && pos[8] == symbol) ||
-        (pos[0] == symbol && pos[3] == symbol && pos[6] == symbol) ||
-        (pos[1] == symbol && pos[4] == symbol && pos[7] == symbol) ||
-        (pos[0] == symbol && pos[4] == symbol && pos[8] == symbol) ||
-        (pos[2] == symbol && pos[4] == symbol && pos[6] == symbol)) {
-        return true;
-    } else
-        return false;
-}
+/* bool checkWin(char pos[], bool turn) { */
+/*     char symbol; */
+/*     turn ? symbol = 'X' : symbol = 'O'; */
+/*     if ((pos[0] == symbol && pos[1] == symbol && pos[2] == symbol) || */
+/*         (pos[3] == symbol && pos[4] == symbol && pos[5] == symbol) || */
+/*         (pos[6] == symbol && pos[7] == symbol && pos[8] == symbol) || */
+/*         (pos[0] == symbol && pos[3] == symbol && pos[6] == symbol) || */
+/*         (pos[1] == symbol && pos[4] == symbol && pos[7] == symbol) || */
+/*         (pos[0] == symbol && pos[4] == symbol && pos[8] == symbol) || */
+/*         (pos[2] == symbol && pos[4] == symbol && pos[6] == symbol)) { */
+/*         return true; */
+/*     } else */
+/*         return false; */
+/* } */
 
 bool gameMode() {
     while (1) {
@@ -93,6 +93,7 @@ int evaluate(char pos[]) {
     return 0;
 }
 
+// Checking for draws and in minimax func
 bool isMoveLeft(char pos[]) {
     for (int i = 0; i < 9; i++) {
         if (pos[i] == ' ') {
@@ -214,6 +215,16 @@ class Utils {
         }
         std::cout << '\n';
     }
+
+    void winningMessage(bool playerTurn) {
+        if (isSinglePlayer) {
+            playerTurn ? std::cout << "Player 1 won!!"
+                       : std::cout << "Computer won!!";
+        } else {
+            playerTurn ? std::cout << "Player 1 won!!"
+                       : std::cout << "Player 2 won!!";
+        }
+    }
 };
 
 // Simple logic jobs
@@ -245,13 +256,27 @@ class Logic {
         }
         return false;
     }
+
+    bool checkWin(char pos[], bool turn) {
+        char symbol;
+        turn ? symbol = 'X' : symbol = 'O';
+        if ((pos[0] == symbol && pos[1] == symbol && pos[2] == symbol) ||
+            (pos[3] == symbol && pos[4] == symbol && pos[5] == symbol) ||
+            (pos[6] == symbol && pos[7] == symbol && pos[8] == symbol) ||
+            (pos[0] == symbol && pos[3] == symbol && pos[6] == symbol) ||
+            (pos[1] == symbol && pos[4] == symbol && pos[7] == symbol) ||
+            (pos[0] == symbol && pos[4] == symbol && pos[8] == symbol) ||
+            (pos[2] == symbol && pos[4] == symbol && pos[6] == symbol)) {
+            return true;
+        } else
+            return false;
+    }
 };
 
 int main() {
     bool playerTurn = true;
     char pos[9];
     int field;
-    /* int turnCount; */
 
     for (int i = 0; i < 9; i++) {
         pos[i] = ' ';
@@ -263,7 +288,6 @@ int main() {
         Utils utils(field, playerTurn, true);
         Logic logic(playerTurn);
 
-        /* drawBoard(pos); */
         utils.drawBoard(pos);
 
         while (1) {
@@ -272,11 +296,6 @@ int main() {
 
             field = utils.promptForInput();
 
-            /* if (field < 1 || field > 9 || pos[field - 1] != ' ') { */
-            /*     drawBoard(pos); */
-            /*     std::cout << "INVALID FIELD" << std::endl; */
-            /*     continue; */
-            /* } */
             if (!logic.validateField(pos, field)) {
                 utils.drawBoard(pos);
                 continue;
@@ -284,16 +303,13 @@ int main() {
 
             pos[field - 1] = 'X';
 
-            if (checkWin(pos, playerTurn)) {
-
-                playerTurn ? std::cout << "Player 1 won!!"
-                           : std::cout << "Computer won!!";
+            if (logic.checkWin(pos, playerTurn)) {
+                utils.winningMessage(playerTurn);
                 break;
             }
 
             playerTurn = logic.switchTurn();
 
-            /* turnCount++; */
             if (!logic.isMoveLeft(pos)) {
                 std::cout << "It's a draw!" << std::endl;
                 break;
@@ -307,17 +323,13 @@ int main() {
             /* drawBoard(pos); */
             utils.drawBoard(pos);
 
-            if (checkWin(pos, playerTurn)) {
-
-                playerTurn ? std::cout << "Player 1 won!!"
-                           : std::cout << "Computer won!!";
+            if (logic.checkWin(pos, playerTurn)) {
+                utils.winningMessage(playerTurn);
                 break;
             }
 
             playerTurn = logic.switchTurn();
-            /* playerTurn ? playerTurn = false : playerTurn = true; */
 
-            /* turnCount++; */
             if (!logic.isMoveLeft(pos)) {
                 std::cout << "It's a draw!" << std::endl;
                 break;
@@ -329,7 +341,6 @@ int main() {
         Utils utils(field, playerTurn, false);
         Logic logic(playerTurn);
 
-        /* drawBoard(pos); */
         utils.drawBoard(pos);
 
         while (1) {
@@ -346,17 +357,13 @@ int main() {
 
                 playerTurn ? pos[field - 1] = 'X' : pos[field - 1] = 'O';
 
-                /* drawBoard(pos); */
                 utils.drawBoard(pos);
 
-                if (checkWin(pos, playerTurn)) {
-
-                    playerTurn ? std::cout << "Player 1 won!!"
-                               : std::cout << "Player 2 won!!";
+                if (logic.checkWin(pos, playerTurn)) {
+                    utils.winningMessage(playerTurn);
                     break;
                 }
 
-                /* turnCount++; */
                 if (!logic.isMoveLeft(pos)) {
                     std::cout << "It's a draw!" << std::endl;
                     break;
