@@ -2,18 +2,6 @@
 #include <iostream>
 #include <limits>
 
-void drawBoard(char pos[]) {
-    std::cout << '\n';
-    for (int i = 0; i < 9; i = i + 3) {
-        std::cout << pos[i] << "|" << pos[i + 1] << "|" << pos[i + 2]
-                  << std::endl;
-        if (i < 6) {
-            std::cout << "-+-+-" << std::endl;
-        }
-    }
-    std::cout << '\n';
-}
-
 bool gameMode() {
     while (1) {
         std::cout << "1: Single-player Mode\n2: Two-player Mode\n\n";
@@ -35,6 +23,7 @@ bool gameMode() {
 // 0 1 2
 // 3 4 5
 // 6 7 8
+// Returns scores for the minimax algo
 int evaluate(char pos[]) {
     // columns
     for (int i = 0; i < 3; i++) {
