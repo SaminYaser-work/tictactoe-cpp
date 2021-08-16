@@ -14,24 +14,6 @@ void drawBoard(char pos[]) {
     std::cout << '\n';
 }
 
-// 0 1 2
-// 3 4 5
-// 6 7 8
-/* bool checkWin(char pos[], bool turn) { */
-/*     char symbol; */
-/*     turn ? symbol = 'X' : symbol = 'O'; */
-/*     if ((pos[0] == symbol && pos[1] == symbol && pos[2] == symbol) || */
-/*         (pos[3] == symbol && pos[4] == symbol && pos[5] == symbol) || */
-/*         (pos[6] == symbol && pos[7] == symbol && pos[8] == symbol) || */
-/*         (pos[0] == symbol && pos[3] == symbol && pos[6] == symbol) || */
-/*         (pos[1] == symbol && pos[4] == symbol && pos[7] == symbol) || */
-/*         (pos[0] == symbol && pos[4] == symbol && pos[8] == symbol) || */
-/*         (pos[2] == symbol && pos[4] == symbol && pos[6] == symbol)) { */
-/*         return true; */
-/*     } else */
-/*         return false; */
-/* } */
-
 bool gameMode() {
     while (1) {
         std::cout << "1: Single-player Mode\n2: Two-player Mode\n\n";
@@ -225,9 +207,11 @@ class Utils {
                        : std::cout << "Player 2 won!!";
         }
     }
+
+    void drawMessage() { std::cout << "It's a Draw!!\n"; }
 };
 
-// Simple logic jobs
+// Simple logic related jobs
 class Logic {
   private:
     bool playerTurn;
@@ -311,16 +295,14 @@ int main() {
             playerTurn = logic.switchTurn();
 
             if (!logic.isMoveLeft(pos)) {
-                std::cout << "It's a draw!" << std::endl;
+                utils.drawMessage();
                 break;
             }
 
             std::cout << "Computer's turn...\n";
 
-            std::cout << bestMove(pos) << "\n";
             pos[bestMove(pos)] = 'O';
 
-            /* drawBoard(pos); */
             utils.drawBoard(pos);
 
             if (logic.checkWin(pos, playerTurn)) {
@@ -328,12 +310,12 @@ int main() {
                 break;
             }
 
-            playerTurn = logic.switchTurn();
-
             if (!logic.isMoveLeft(pos)) {
-                std::cout << "It's a draw!" << std::endl;
+                utils.drawMessage();
                 break;
             }
+
+            playerTurn = logic.switchTurn();
         }
     }
 
@@ -349,9 +331,8 @@ int main() {
 
             field = utils.promptForInput();
 
-            if (field < 1 || field > 9 || pos[field - 1] != ' ') {
-                drawBoard(pos);
-                std::cout << "INVALID FIELD" << std::endl;
+            if (!logic.validateField(pos, field)) {
+                utils.drawBoard(pos);
                 continue;
             } else {
 
@@ -365,7 +346,7 @@ int main() {
                 }
 
                 if (!logic.isMoveLeft(pos)) {
-                    std::cout << "It's a draw!" << std::endl;
+                    utils.drawMessage();
                     break;
                 }
 
