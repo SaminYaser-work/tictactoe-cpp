@@ -1,6 +1,6 @@
-#include <algorithm>
 #include <iostream>
 #include <limits>
+#include <random>
 
 bool gameMode() {
     while (1) {
@@ -70,6 +70,7 @@ class Utils {
     int field;
     bool playerTurn;
     bool isSinglePlayer;
+    int difficulty;
 
   public:
     Utils(int field, bool playerTurn, bool isSinglePlayer) {
@@ -93,6 +94,25 @@ class Utils {
         std::cout << "\n";
 
         return field;
+    }
+
+    bool difficultySelection() {
+        std::cout << "1: Easy Difficulty\n";
+        std::cout << "2: Hard Difficulty\n";
+        std::cout << "\n";
+        std::cout << "Choose Difficulty: ";
+
+        std::cin >> difficulty;
+        std::cout << "\n";
+        switch (difficulty) {
+        case 1:
+            return false;
+        case 2:
+            return true;
+        default:
+            std::cout << "Invalid Selection! Choosing Easy Difficulty...\n";
+            return false;
+        }
     }
 
     void drawBoard(char pos[]) {
@@ -216,13 +236,25 @@ int minimax(char pos[], bool isMaxTurn, Logic &logic) {
     }
 }
 
-int bestMove(char pos[], Logic &logic) {
+int bestMove(char pos[], Logic &logic, bool isHard) {
     int bestScore = std::numeric_limits<int>::min();
     int bestPos = -1;
+    int random;
+
+    if (!isHard) {
+        std::random_device dev;
+        std::mt19937 rng(dev());
+        std::uniform_int_distribution<std::mt19937::result_type> dist(0, 9);
+        random = dist(rng);
+    }
 
     for (int i = 0; i < 9; i++) {
         if (pos[i] == ' ') {
             pos[i] = 'O';
+
+            if (!isHard && random >= 5) {
+                return i;
+            }
 
             int moveScore = minimax(pos, false, logic);
 
@@ -247,11 +279,18 @@ int main() {
         pos[i] = ' ';
     }
 
+#ifdef __linux__
+    system("figlet TicTacToe");
+#endif
+
     // Singleplayer
     if (gameMode()) {
 
         Utils utils(field, playerTurn, true);
         Logic logic(playerTurn);
+
+        std::cout << std::endl;
+        bool isHard = utils.difficultySelection();
 
         utils.drawBoard(pos);
 
@@ -283,7 +322,7 @@ int main() {
 
             std::cout << "Computer's turn...\n";
 
-            pos[bestMove(pos, logic)] = 'O';
+            pos[bestMove(pos, logic, isHard)] = 'O';
 
             utils.drawBoard(pos);
 
@@ -329,6 +368,7 @@ int main() {
                 }
 
                 if (!logic.isMoveLeft(pos)) {
+                    utils.drawBoard(pos);
                     utils.drawMessage();
                     break;
                 }

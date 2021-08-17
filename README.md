@@ -6,4 +6,4 @@ Single player is done by minimax algorithm (impossible to win).
 ## TODO:
 * ~~Clean up the code~~
 * ~~Implement object oriented programming~~
-* Introduce easy difficulty in single player mode (Possible to win)
+* ~~Introduce easy difficulty in single player mode (Possible to win)~~
