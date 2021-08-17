@@ -64,86 +64,6 @@ int evaluate(char pos[]) {
     return 0;
 }
 
-// Checking for draws and in minimax func
-bool isMoveLeft(char pos[]) {
-    for (int i = 0; i < 9; i++) {
-        if (pos[i] == ' ') {
-            return true;
-        }
-    }
-    return false;
-}
-
-int minimax(char pos[], bool isMaxTurn) {
-    int moveScore = evaluate(pos);
-
-    if (moveScore == 10) {
-        return moveScore;
-    }
-
-    if (moveScore == -10) {
-        return moveScore;
-    }
-
-    if (isMoveLeft(pos) == false)
-        return 0;
-
-    if (isMaxTurn) {
-        int bestScore = std::numeric_limits<int>::min();
-
-        for (int i = 0; i < 9; i++) {
-            if (pos[i] == ' ') {
-                pos[i] = 'O';
-
-                bestScore = std::max(bestScore, minimax(pos, !isMaxTurn));
-
-                pos[i] = ' ';
-            }
-        }
-
-        return bestScore;
-    }
-
-    else {
-
-        int bestScore = std::numeric_limits<int>::max();
-
-        for (int i = 0; i < 9; i++) {
-            if (pos[i] == ' ') {
-                pos[i] = 'X';
-
-                bestScore = std::min(bestScore, minimax(pos, !isMaxTurn));
-
-                pos[i] = ' ';
-            }
-        }
-
-        return bestScore;
-    }
-}
-
-int bestMove(char pos[]) {
-    int bestScore = std::numeric_limits<int>::min();
-    int bestPos = -1;
-
-    for (int i = 0; i < 9; i++) {
-        if (pos[i] == ' ') {
-            pos[i] = 'O';
-
-            int moveScore = minimax(pos, false);
-
-            pos[i] = ' ';
-
-            if (moveScore > bestScore) {
-                bestPos = i;
-                bestScore = moveScore;
-            }
-        }
-    }
-
-    return bestPos;
-}
-
 // Text output jobs
 class Utils {
   private:
@@ -246,6 +166,78 @@ class Logic {
     }
 };
 
+int minimax(char pos[], bool isMaxTurn, Logic &logic) {
+    int moveScore = evaluate(pos);
+
+    if (moveScore == 10) {
+        return moveScore;
+    }
+
+    if (moveScore == -10) {
+        return moveScore;
+    }
+
+    if (logic.isMoveLeft(pos) == false)
+        return 0;
+
+    if (isMaxTurn) {
+        int bestScore = std::numeric_limits<int>::min();
+
+        for (int i = 0; i < 9; i++) {
+            if (pos[i] == ' ') {
+                pos[i] = 'O';
+
+                bestScore =
+                    std::max(bestScore, minimax(pos, !isMaxTurn, logic));
+
+                pos[i] = ' ';
+            }
+        }
+
+        return bestScore;
+    }
+
+    else {
+
+        int bestScore = std::numeric_limits<int>::max();
+
+        for (int i = 0; i < 9; i++) {
+            if (pos[i] == ' ') {
+                pos[i] = 'X';
+
+                bestScore =
+                    std::min(bestScore, minimax(pos, !isMaxTurn, logic));
+
+                pos[i] = ' ';
+            }
+        }
+
+        return bestScore;
+    }
+}
+
+int bestMove(char pos[], Logic &logic) {
+    int bestScore = std::numeric_limits<int>::min();
+    int bestPos = -1;
+
+    for (int i = 0; i < 9; i++) {
+        if (pos[i] == ' ') {
+            pos[i] = 'O';
+
+            int moveScore = minimax(pos, false, logic);
+
+            pos[i] = ' ';
+
+            if (moveScore > bestScore) {
+                bestPos = i;
+                bestScore = moveScore;
+            }
+        }
+    }
+
+    return bestPos;
+}
+
 int main() {
     bool playerTurn = true;
     char pos[9];
@@ -284,13 +276,14 @@ int main() {
             playerTurn = logic.switchTurn();
 
             if (!logic.isMoveLeft(pos)) {
+                utils.drawBoard(pos);
                 utils.drawMessage();
                 break;
             }
 
             std::cout << "Computer's turn...\n";
 
-            pos[bestMove(pos)] = 'O';
+            pos[bestMove(pos, logic)] = 'O';
 
             utils.drawBoard(pos);
 
@@ -300,6 +293,7 @@ int main() {
             }
 
             if (!logic.isMoveLeft(pos)) {
+                utils.drawBoard(pos);
                 utils.drawMessage();
                 break;
             }
