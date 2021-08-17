@@ -1,7 +1,7 @@
 # tictactoe-cpp
 Single player or two player tic-tac-toe game in command line.
 
-Single player is done by minimax algorithm (impossible to win).
+Single player is done by minimax algorithm (~~impossible~~ now possible to win).
 
 ## TODO:
 * ~~Clean up the code~~
